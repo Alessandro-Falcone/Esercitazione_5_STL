@@ -41,34 +41,33 @@ namespace PolygonalLibrary{
             return false;
         }else{
 
-        // Test:
-        for(unsigned int c = 0; c < mesh.NumberCell2Ds; c++){
-            vector<unsigned int> edges = mesh.EdgesCell2Ds[c];
+            // Test:
+            for(unsigned int c = 0; c < mesh.NumberCell2Ds; c++){
+                vector<unsigned int> edges = mesh.EdgesCell2Ds[c];
 
-            for(unsigned int e = 0; e < edges.size(); e++){
+                for(unsigned int e = 0; e < edges.size(); e++){
 
-                const unsigned int origin = mesh.VerticesCell1Ds[edges[e]][0];
-                const unsigned int end = mesh.VerticesCell1Ds[edges[e]][1];
+                    const unsigned int origin = mesh.VerticesCell1Ds[edges[e]][0];
+                    const unsigned int end = mesh.VerticesCell1Ds[edges[e]][1];
 
-                auto findOrigin = find(mesh.VerticesCell2Ds[c].begin(), mesh.VerticesCell2Ds[c].end(), origin);
-                if(findOrigin == mesh.VerticesCell2Ds[c].end()){
-                    cerr << "Wrong mesh" << endl;
-                    return 2;
-                }
+                    auto findOrigin = find(mesh.VerticesCell2Ds[c].begin(), mesh.VerticesCell2Ds[c].end(), origin);
+                    if(findOrigin == mesh.VerticesCell2Ds[c].end()){
+                        cerr << "Mesh sbagliata" << endl;
+                        return 2;
+                    }
 
-                auto findEnd = find(mesh.VerticesCell2Ds[c].begin(), mesh.VerticesCell2Ds[c].end(), end);
-                if(findEnd == mesh.VerticesCell2Ds[c].end()){
-                    cerr << "Wrong mesh" << endl;
-                    return 3;
+                    auto findEnd = find(mesh.VerticesCell2Ds[c].begin(), mesh.VerticesCell2Ds[c].end(), end);
+                    if(findEnd == mesh.VerticesCell2Ds[c].end()){
+                        cerr << "Mesh sbagliata" << endl;
+                        return 3;
+                    }
                 }
             }
         }
-    }
-    return true;
+        return true;
     }
 
     bool letturaDatiFileCell0Ds(const string &percorsoFileCell0Ds, PolygonalMesh &mesh){
-
 
             ifstream fileCell0Ds;
             fileCell0Ds.open(percorsoFileCell0Ds);
@@ -93,7 +92,6 @@ namespace PolygonalLibrary{
 
             mesh.IdCell0Ds.reserve(mesh.NumberCell0Ds);
             mesh.CoordinatesCell0Ds.reserve(mesh.NumberCell0Ds);
-
 
             for(string &line : listLines){
 
@@ -125,6 +123,7 @@ namespace PolygonalLibrary{
                         mesh.MarkersCell0Ds[marker].push_back(id);
                 }
             }
+            fileCell0Ds.close();
             return true;
         }
     }
@@ -137,6 +136,53 @@ namespace PolygonalLibrary{
         if(fileCell1Ds.fail()){
             return false;
         }else{
+
+            list<string> listLines;
+            string line;
+            while(getline(fileCell1Ds, line)){
+                listLines.push_back(line);
+            }
+
+            fileCell1Ds.close();
+
+            listLines.pop_front();
+            mesh.NumberCell1Ds = listLines.size();
+            if(mesh.NumberCell1Ds == 0){
+                cerr << "Non ci sono cell 1Ds" << endl;
+                return false;
+            }
+
+            mesh.IdCell1Ds.reserve(mesh.NumberCell1Ds);
+            mesh.VerticesCell1Ds.reserve(mesh.NumberCell1Ds);
+
+            for(const string& line : listLines){
+
+                istringstream converter(line);
+                unsigned int id, marker;
+                string riga;
+                Vector2i vertices;
+
+                getline(converter,riga,';');
+                id = stoi(riga);
+                getline(converter,riga,';');
+                marker = stoi(riga);
+                getline(converter,riga,';');
+                vertices(0) = stoi(riga);
+                getline(converter,riga,';');
+                vertices(1) = stoi(riga);
+
+                mesh.IdCell1Ds.push_back(id);
+                mesh.VerticesCell1Ds.push_back(vertices);
+
+                if(marker != 0){
+                    if(mesh.MarkersCell1Ds.find(marker) == mesh.MarkersCell1Ds.end()){
+                        mesh.MarkersCell1Ds.insert({marker, {id}});
+                    }else{
+                        mesh.MarkersCell1Ds[marker].push_back(id);
+                    }
+                }
+            }
+            fileCell1Ds.close();
             return true;
         }
     }
@@ -149,6 +195,33 @@ namespace PolygonalLibrary{
         if(fileCell2Ds.fail()){
             return false;
         }else{
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             return true;
         }
     }
