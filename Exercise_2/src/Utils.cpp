@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 namespace PolygonalLibrary{
 
@@ -117,10 +118,13 @@ namespace PolygonalLibrary{
                 mesh.CoordinatesCell0Ds.push_back(coord);
 
                 if(marker != 0){
-                    if(mesh.MarkersCell0Ds.find(marker) == mesh.MarkersCell0Ds.end())
-                        mesh.MarkersCell0Ds.insert({marker, {id}});
-                    else
-                        mesh.MarkersCell0Ds[marker].push_back(id);
+                    // if(mesh.MarkersCell0Ds.find(marker) == mesh.MarkersCell0Ds.end())
+                    //     mesh.MarkersCell0Ds.insert({marker, {id}});
+                    // else
+                    //     mesh.MarkersCell0Ds[marker].push_back(id);
+                    auto ret = mesh.MarkersCell0Ds.insert({marker, {id}});
+                    if(!ret.second)
+                        (ret.first)->second.push_back(id);
                 }
             }
             fileCell0Ds.close();
@@ -164,10 +168,13 @@ namespace PolygonalLibrary{
 
                 getline(converter,riga,';');
                 id = stoi(riga);
+
                 getline(converter,riga,';');
                 marker = stoi(riga);
+
                 getline(converter,riga,';');
                 vertices(0) = stoi(riga);
+
                 getline(converter,riga,';');
                 vertices(1) = stoi(riga);
 
@@ -175,11 +182,14 @@ namespace PolygonalLibrary{
                 mesh.VerticesCell1Ds.push_back(vertices);
 
                 if(marker != 0){
-                    if(mesh.MarkersCell1Ds.find(marker) == mesh.MarkersCell1Ds.end()){
-                        mesh.MarkersCell1Ds.insert({marker, {id}});
-                    }else{
-                        mesh.MarkersCell1Ds[marker].push_back(id);
-                    }
+                    // if(mesh.MarkersCell1Ds.find(marker) == mesh.MarkersCell1Ds.end()){
+                    //     mesh.MarkersCell1Ds.insert({marker, {id}});
+                    // }else{
+                    //     mesh.MarkersCell1Ds[marker].push_back(id);
+                    // }
+                    auto ret = mesh.MarkersCell1Ds.insert({marker, {id}});
+                    if(!ret.second)
+                        (ret.first)->second.push_back(id);
                 }
             }
             fileCell1Ds.close();
@@ -196,32 +206,95 @@ namespace PolygonalLibrary{
             return false;
         }else{
 
+            list<string> listLines;
+            string line;
+            while(getline(fileCell2Ds, line)){
+                listLines.push_back(line);
+            }
 
+            fileCell2Ds.close();
 
+            listLines.pop_front();
 
+            mesh.NumberCell2Ds = listLines.size();
 
+            if(mesh.NumberCell2Ds == 0){
+                cerr << "Non ci sono cell 2D" << endl;
+                return false;
+            }
 
+            mesh.IdCell2Ds.reserve(mesh.NumberCell2Ds);
+            mesh.VerticesCell2Ds.reserve(mesh.NumberCell2Ds);
+            mesh.EdgesCell2Ds.reserve(mesh.NumberCell2Ds);
 
+            for(const string& line : listLines){
 
+                istringstream converter(line);
+                string riga;
+                unsigned int id;
+                unsigned int marker;
+                unsigned int nVertices;
+                unsigned int nEdges;
+                vector<unsigned int> vertices;
+                vector<unsigned int> edges;
 
+                getline(converter,riga,';');
+                id = stoi(riga);
 
+                getline(converter,riga,';');
+                marker = stoi(riga);
 
+                getline(converter,riga,';');
+                nVertices = stoi(riga);
 
+                for(unsigned int i = 0; i < nVertices; i++){
+                    getline(converter, riga, ';');
+                    vertices.push_back(stoi(riga));
+                }
 
+                getline(converter, riga, ';');
+                nEdges = stoi(riga);
 
+                for(unsigned int i = 0; i < nEdges; i++){
+                    getline(converter, riga, ';');
+                    edges.push_back(stoi(riga));
+                }
 
+                if(nVertices == 3 && nEdges == 3){
+                    cout << "triangolo alla riga: " << id << endl;
+                    cout << "vertici: ";
+                }
 
+                // if(mesh.NumberCell2Ds != 0){
+                //    cout << line << " ";
+                // }
 
+                for(unsigned int i = 0; i < nVertices; i++){
+                    if(nVertices == 3 && nEdges == 3){
+                        cout << vertices[i] << " ";
+                    }
+                }
 
+                cout << "lati: ";
+                for(unsigned int i = 0; i < nEdges; i++){
+                    cout << edges[i] << " ";
+                }
+                cout << "\n";
 
+                mesh.IdCell2Ds.push_back(id);
+                mesh.VerticesCell2Ds.push_back(vertices);
+                mesh.EdgesCell2Ds.push_back(edges);
 
+                if(marker != 0)
+                {
+                    if(mesh.MarkersCell2Ds.find(marker) == mesh.MarkersCell2Ds.end())
+                        mesh.MarkersCell2Ds.insert({marker, {id}});
+                    else
+                        mesh.MarkersCell2Ds[marker].push_back(id);
+                }
+            }
 
-
-
-
-
-
-
+            fileCell2Ds.close();
             return true;
         }
     }

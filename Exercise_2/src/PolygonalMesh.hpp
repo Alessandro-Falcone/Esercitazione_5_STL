@@ -24,9 +24,7 @@ namespace PolygonalLibrary{
 
         unsigned int NumberCell2Ds = 0;
         vector<unsigned int> IdCell2Ds = {};
-        vector<unsigned int> NumVerticesCell2Ds = {};
         vector<vector<unsigned int>> VerticesCell2Ds = {};
-        vector<unsigned int> NumEdgesCell2Ds = {};
         vector<vector<unsigned int>> EdgesCell2Ds = {};
         map<unsigned int, list<unsigned int>> MarkersCell2Ds = {};
 
