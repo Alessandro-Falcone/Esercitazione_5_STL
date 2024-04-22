@@ -15,9 +15,15 @@ bool letturaDatiFileCell1Ds(const string &percorsoFileCell1Ds, PolygonalMesh &me
 
 bool letturaDatiFileCell2Ds(const string &percorsoFileCell2Ds, PolygonalMesh &mesh);
 
-bool datiFileCell0Ds(const string& percorsoCell0Ds, unsigned int*& id, double*& x, double*& y, const unsigned int numeroRigheCell0Ds);
+bool datiFileCell0Ds(const string& percorsoCell0Ds,
+                     unsigned int*& id, double*& x, double*& y,
+                     const unsigned int numeroRigheCell0Ds);
 
-bool datiFileCell2Ds(const string& percorsoCell2Ds, unsigned int& nVertices, unsigned int& nEdges, Vector3i& vertices, Vector3i& edges);
+bool datiFileCell2Ds(const string& percorsoCell2Ds,
+                     unsigned int& nVertices, unsigned*& v1,
+                     unsigned int*& v2, unsigned int*& v3,
+                     const unsigned int numeroRigheCell2Ds,
+                     unsigned int& nTriangoli);
 
 }
 
