@@ -20,8 +20,7 @@ bool datiFileCell0Ds(const string& percorsoCell0Ds,
                      const unsigned int numeroRigheCell0Ds);
 
 bool datiFileCell2Ds(const string& percorsoCell2Ds,
-                     unsigned int& nVertices, unsigned*& v1,
-                     unsigned int*& v2, unsigned int*& v3,
+                     unsigned*& v1, unsigned int*& v2, unsigned int*& v3,
                      const unsigned int numeroRigheCell2Ds,
                      unsigned int& nTriangoli);
 

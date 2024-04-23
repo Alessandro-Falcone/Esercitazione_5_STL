@@ -347,8 +347,7 @@ namespace PolygonalLibrary{
     }
 
     bool datiFileCell2Ds(const string& percorsoCell2Ds,
-                         unsigned int& nVertices, unsigned int*& v1,
-                         unsigned int*& v2, unsigned int*& v3,
+                         unsigned int*& v1, unsigned int*& v2, unsigned int*& v3,
                          const unsigned int numeroRigheCell2Ds,
                          unsigned int& nTriangoli){
 
@@ -360,7 +359,7 @@ namespace PolygonalLibrary{
         }else{
             string line;
 
-            nVertices = 0;
+            unsigned int nVertices = 0;
             v1 = new unsigned int[numeroRigheCell2Ds];
             v2 = new unsigned int[numeroRigheCell2Ds];
             v3 = new unsigned int[numeroRigheCell2Ds];
@@ -393,6 +392,7 @@ namespace PolygonalLibrary{
                     getline(Cell2Ds, line, ';');
                     getline(Cell2Ds, line, ';'); 
                     getline(Cell2Ds, line);
+
                     nTriangoli++;
                 }else{
                     getline(Cell2Ds, line);
