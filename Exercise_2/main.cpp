@@ -1,12 +1,23 @@
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include "PolygonalMesh.hpp"
 #include "Utils.hpp"
 #include "Eigen/Eigen"
+// #include <math.h>
 
 using namespace std;
 using namespace Eigen;
 using namespace PolygonalLibrary;
+
+double lunghezzaLato(double diffx, double diffy){
+
+    double lunLato = 0;
+
+    lunLato = sqrt((diffx*diffx) + (diffy*diffy));
+
+    return lunLato;
+}
 
 
 int main(){
@@ -26,6 +37,9 @@ int main(){
     unsigned int* v3 = nullptr;
     unsigned int numeroRigheCell2Ds = 0;
     unsigned int nTriangoli = 0;
+    double lato1 = 0;
+    double lato2 = 0;
+    double lato3 = 0;
 
     if(!letturaMesh(percorso, mesh)){
        cerr << "Errore: impossibile leggere la mesh" << endl;
@@ -72,17 +86,24 @@ int main(){
         cerr << "Errore: impossibile aprire il file" << endl;
         return 1;
     }else{
-
-        cout << nTriangoli << endl;
+        cout << "Nel file Cell0Ds sono stati individuati " << nTriangoli << " triangoli"<< endl;
             for(unsigned int i = 0; i < nTriangoli; i++){
-                for(unsigned int j = 0; j < numeroRigheCell0Ds; j++){
-                    if(v1[i] == id[j]){
-                        cout << i << " id: " << id[j] << "--";
-                    }
+                // cout << "v1: " << v1[i] << " " << x[v1[i]] << " " << "v2: " << v2[i] << " x2: " << x[v2[i]] << " y: " << y[v1[i]] << " " << y[v2[i]] << endl;
+                lato1 = lunghezzaLato(abs(x[v1[i]] - x[v2[i]]), abs(y[v1[i]] - y[v2[i]]));
+                if(lato1 <= 1e-27){
+                    cerr << "i punti sono uguali" << endl;
+
+                }else{
+                    cout << fixed << setprecision(12) << i << " lato 1: "  << lato1 << endl;
                 }
+                lato2 = lunghezzaLato(abs(x[v1[i]] - x[v3[i]]), abs(y[v1[i]] - y[v3[i]]));
+                cout << fixed << setprecision(12) << i <<" lato 2: " << lato2 << endl;
+                lato3 = lunghezzaLato(abs(x[v2[i]] - x[v3[i]]), abs(y[v1[i]] - y[v3[i]]));
+                cout << fixed << setprecision(12) << i << " lato 3: " << lato3 << endl;
             }
-    cout << endl;
+
     }
+
     delete[] id;
     delete[] x;
     delete[] y;
