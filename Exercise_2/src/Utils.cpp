@@ -15,6 +15,7 @@ namespace PolygonalLibrary{
         if(!letturaDatiFileCell0Ds(fileCell0Ds, mesh)){
             return false;
         }else{
+
             cout << "Cell0Ds markers: " << endl;
             for(auto it = mesh.MarkersCell0Ds.begin(); it != mesh.MarkersCell0Ds.end(); it++){
 
@@ -30,6 +31,7 @@ namespace PolygonalLibrary{
         if(!letturaDatiFileCell1Ds(fileCell1Ds, mesh)){
             return false;
         }else{
+
             cout << "Cell1D marker:" << endl;
             for(auto it = mesh.MarkersCell1Ds.begin(); it != mesh.MarkersCell1Ds.end(); it++){
                 cout << "key: " << it -> first << " values:";
@@ -45,9 +47,24 @@ namespace PolygonalLibrary{
             return false;
         }else{
 
+            // cout << "Cell2D marker:" << endl;
+            // for(auto it = mesh.MarkersCell2Ds.begin(); it != mesh.MarkersCell2Ds.end(); it++){
+            //     cout << "key: " << it -> first << " values:";
+            //     for(const unsigned int id : it -> second){
+            //         cout << " " << id;
+            //     }
+            //     cout << endl;
+            // }
+
             // Test:
             for(unsigned int c = 0; c < mesh.NumberCell2Ds; c++){
+
                 vector<unsigned int> edges = mesh.EdgesCell2Ds[c];
+
+                // for(unsigned int i = 0; i < edges.size(); i++) {
+                //     cout << edges[i] << " ";
+                // }
+                // cout << endl;
 
                 for(unsigned int e = 0; e < edges.size(); e++){
 
@@ -66,6 +83,35 @@ namespace PolygonalLibrary{
                         return 3;
                     }
                 }
+            }
+
+            // Test lati:
+            double diffx = 0;
+            double diffy = 0;
+            double lunghezzaLato = 0;
+            for(unsigned int i = 0; i < mesh.NumberCell1Ds; i++){
+
+                Vector2i origine = mesh.VerticesCell1Ds[i];
+                diffx = abs(mesh.CoordinatesCell0Ds[origine[0]][0] - mesh.CoordinatesCell0Ds[origine[1]][0]);
+                diffy = abs(mesh.CoordinatesCell0Ds[origine[0]][1] - mesh.CoordinatesCell0Ds[origine[1]][1]);
+
+                lunghezzaLato = sqrt(diffx*diffx + diffy*diffy);
+                // if(lunghezzaLato > 1e-5){
+                //     cout << origine[0] << " " << origine[1] << " distanza x: " << diffx << " distanza y: "  << diffy << " lunghezza lato: " << lunghezzaLato << endl;
+                // }
+            }
+
+            // Test area poligoni:
+            double distanza = 0;
+            for(unsigned int i = 0; i < mesh.NumberCell2Ds; i++){
+                vector<unsigned int> vertices = mesh.VerticesCell2Ds[i];
+
+                for(unsigned int j = 0; j < vertices.size() - 1; j++){
+                        distanza = mesh.CoordinatesCell0Ds[vertices[j]][0]*mesh.CoordinatesCell0Ds[vertices[j+1]][1];
+                    cout << vertices[j] << " x0: " << mesh.CoordinatesCell0Ds[vertices[j]][0] << " " << vertices[j+1] << " y1: " << mesh.CoordinatesCell0Ds[vertices[j]][1]
+                         << " prodotto: "<< mesh.CoordinatesCell0Ds[vertices[j]][0]*mesh.CoordinatesCell0Ds[vertices[j+1]][1] << endl;
+                }
+                // cout << endl;
             }
         }
         return true;
@@ -100,20 +146,17 @@ namespace PolygonalLibrary{
             for(string &line : listLines){
 
                 istringstream converter(line);
-                unsigned int id;
-                unsigned int marker;
                 string riga;
+                unsigned int id, marker;
                 Vector2d coord;
 
                 getline(converter,riga,';');
                 id = stoi(riga);
-
                 getline(converter,riga,';');
                 marker = stoi(riga);
 
                 getline(converter,riga,';');
                 coord(0) = stod(riga);
-
                 getline(converter,riga,';');
                 coord(1) = stod(riga);
 
@@ -166,20 +209,17 @@ namespace PolygonalLibrary{
             for(const string& line : listLines){
 
                 istringstream converter(line);
-                unsigned int id;
-                unsigned int marker;
                 string riga;
+                unsigned int id, marker;
                 Vector2i vertices;
 
                 getline(converter,riga,';');
                 id = stoi(riga);
-
                 getline(converter,riga,';');
                 marker = stoi(riga);
 
                 getline(converter,riga,';');
                 vertices(0) = stoi(riga);
-
                 getline(converter,riga,';');
                 vertices(1) = stoi(riga);
 
@@ -237,19 +277,13 @@ namespace PolygonalLibrary{
 
                 istringstream converter(line);
                 string riga;
-                unsigned int id;
-                unsigned int marker;
-                unsigned int nVertices;
-                unsigned int nEdges;
-                vector<unsigned int> vertices;
-                vector<unsigned int> edges;
+                unsigned int id, marker, nVertices, nEdges;
+                vector<unsigned int> vertices, edges;
 
                 getline(converter,riga,';');
                 id = stoi(riga);
-
                 getline(converter,riga,';');
                 marker = stoi(riga);
-
                 getline(converter,riga,';');
                 nVertices = stoi(riga);
 
@@ -266,31 +300,31 @@ namespace PolygonalLibrary{
                     edges.push_back(stoi(riga));
                 }
 
-                if(nVertices == 3 && nEdges == 3){
-                    cout << "\ntriangolo alla riga: " << id << endl;
-                    cout << "vertici: ";
-                }
-
                 // if(mesh.NumberCell2Ds != 0){
-                //    cout << line << " ";
+                //     cout << line << " " << endl;
                 // }
 
-                for(unsigned int i = 0; i < nVertices; i++){
-                    if(nVertices == 3 && nEdges == 3){
-                        cout << vertices[i] << " ";
-                    }
-                }
+                // if(nVertices == 3 && nEdges == 3){
+                //     cout << "\ntriangolo alla riga: " << id << endl;
+                //     cout << "vertici: ";
+                // }
 
-                if(nVertices == 3 && nEdges == 3){
-                    cout << "lati: ";
-                }
+                // for(unsigned int i = 0; i < nVertices; i++){
+                //     if(nVertices == 3 && nEdges == 3){
+                //         cout << vertices[i] << " ";
+                //     }
+                // }
 
-                for(unsigned int i = 0; i < nEdges; i++){
-                    if(nVertices == 3 && nEdges == 3){
-                        cout << edges[i] << " ";
-                    }
-                }
-                // cout << "\n";
+                // if(nVertices == 3 && nEdges == 3){
+                //     cout << "lati: ";
+                // }
+
+                // for(unsigned int i = 0; i < nEdges; i++){
+                //     if(nVertices == 3 && nEdges == 3){
+                //         cout << edges[i] << " ";
+                //     }
+                // }
+                // // cout << "\n";
 
                 mesh.IdCell2Ds.push_back(id);
                 mesh.VerticesCell2Ds.push_back(vertices);
@@ -306,99 +340,9 @@ namespace PolygonalLibrary{
                         (ret.first) -> second.push_back(id);
                 }
             }
-            cout << endl;
+
+            // cout << endl;
             fileCell2Ds.close();
-            return true;
-        }
-    }
-
-    bool datiFileCell0Ds(const string& percorsoCell0Ds, unsigned int*& id, double*& x, double*& y, const unsigned int numeroRigheCell0Ds){
-
-        ifstream Cell0Ds;
-        Cell0Ds.open(percorsoCell0Ds);
-
-        if(Cell0Ds.fail()){
-            return false;
-        }else{
-            string line;
-
-            id = new unsigned int[numeroRigheCell0Ds];
-            x = new double[numeroRigheCell0Ds];
-            y = new double[numeroRigheCell0Ds];
-
-            getline(Cell0Ds, line, ';');
-            getline(Cell0Ds, line, ';');
-            getline(Cell0Ds, line, ';');
-            getline(Cell0Ds, line);
-
-            for(unsigned int i = 0; i < numeroRigheCell0Ds; i++){
-                getline(Cell0Ds, line, ';');
-                id[i] = stoi(line);
-                getline(Cell0Ds, line, ';');
-                getline(Cell0Ds, line, ';');
-                x[i] = stod(line);
-                getline(Cell0Ds, line);
-                y[i] = stod(line);
-            }
-
-            Cell0Ds.close();
-            return true;
-        }
-    }
-
-    bool datiFileCell2Ds(const string& percorsoCell2Ds,
-                         unsigned int*& v1, unsigned int*& v2, unsigned int*& v3,
-                         const unsigned int numeroRigheCell2Ds,
-                         unsigned int& nTriangoli){
-
-        ifstream Cell2Ds;
-        Cell2Ds.open(percorsoCell2Ds);
-
-        if(Cell2Ds.fail()){
-            return false;
-        }else{
-            string line;
-
-            unsigned int nVertices = 0;
-            v1 = new unsigned int[numeroRigheCell2Ds];
-            v2 = new unsigned int[numeroRigheCell2Ds];
-            v3 = new unsigned int[numeroRigheCell2Ds];
-            nTriangoli = 0;
-
-            getline(Cell2Ds, line, ';');
-            getline(Cell2Ds, line, ';');
-            getline(Cell2Ds, line, ';');
-            getline(Cell2Ds, line, ';');
-            getline(Cell2Ds, line, ';');
-            getline(Cell2Ds, line);
-
-            for(unsigned int i = 0; i < numeroRigheCell2Ds; i++){
-                getline(Cell2Ds, line, ';');
-                getline(Cell2Ds, line, ';');
-                getline(Cell2Ds, line, ';');
-                nVertices = stoi(line);
-
-                if(nVertices == 3){
-                    getline(Cell2Ds, line, ';');
-                    v1[nTriangoli] = stoi(line);
-                    // cout << nTriangoli << " v1: " << v1[i] << " ";
-                    getline(Cell2Ds, line, ';');
-                    v2[nTriangoli] = stoi(line);
-
-                    getline(Cell2Ds, line, ';');
-                    v3[nTriangoli] = stoi(line);
-
-                    getline(Cell2Ds, line, ';');
-                    getline(Cell2Ds, line, ';');
-                    getline(Cell2Ds, line, ';'); 
-                    getline(Cell2Ds, line);
-
-                    nTriangoli++;
-                }else{
-                    getline(Cell2Ds, line);
-                }
-            }
-            Cell2Ds.close();
             return true;
         }
     }
