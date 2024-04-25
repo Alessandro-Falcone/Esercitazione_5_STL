@@ -86,6 +86,7 @@ namespace PolygonalLibrary{
             }
 
             // Test lati:
+
             double diffx = 0;
             double diffy = 0;
             double lunghezzaLato = 0;
@@ -102,16 +103,35 @@ namespace PolygonalLibrary{
             }
 
             // Test area poligoni:
-            double distanza = 0;
+
             for(unsigned int i = 0; i < mesh.NumberCell2Ds; i++){
+
                 vector<unsigned int> vertices = mesh.VerticesCell2Ds[i];
 
-                for(unsigned int j = 0; j < vertices.size() - 1; j++){
-                        distanza = mesh.CoordinatesCell0Ds[vertices[j]][0]*mesh.CoordinatesCell0Ds[vertices[j+1]][1];
-                    cout << vertices[j] << " x0: " << mesh.CoordinatesCell0Ds[vertices[j]][0] << " " << vertices[j+1] << " y1: " << mesh.CoordinatesCell0Ds[vertices[j]][1]
-                         << " prodotto: "<< mesh.CoordinatesCell0Ds[vertices[j]][0]*mesh.CoordinatesCell0Ds[vertices[j+1]][1] << endl;
+                double area = 0;
+                double x0 = 0, x1 = 0, y0 = 0, y1 = 0;
+                for(unsigned int j = 0; j < vertices.size(); j++){
+                    if(j < vertices.size() - 1){
+                        x0 = mesh.CoordinatesCell0Ds[vertices[j]][0];
+                        y1 = mesh.CoordinatesCell0Ds[vertices[j+1]][1];
+                        x1 = mesh.CoordinatesCell0Ds[vertices[j+1]][0];
+                        y0 = mesh.CoordinatesCell0Ds[vertices[j]][1];
+                        area += (x0*y1) - (x1*y0);
+                    }else{
+                        x0 = mesh.CoordinatesCell0Ds[vertices[j]][0];
+                        y1 = mesh.CoordinatesCell0Ds[vertices[vertices.size()-j-1]][1];
+                        x1 = mesh.CoordinatesCell0Ds[vertices[vertices.size()-j-1]][0];
+                        y0 = mesh.CoordinatesCell0Ds[vertices[j]][1];
+                        area += (x0*y1) - (x1*y0);
+                    }
+                    // distanza = mesh.CoordinatesCell0Ds[vertices[j]][0]*mesh.CoordinatesCell0Ds[vertices[j+1]][1];
+                    // cout << vertices[j] << " x0: " << mesh.CoordinatesCell0Ds[vertices[j]][0] << " " << vertices[j+1] << " y1: " << mesh.CoordinatesCell0Ds[vertices[j+1]][1]
+                    //     << " prodotto: "<< mesh.CoordinatesCell0Ds[vertices[j]][0]*mesh.CoordinatesCell0Ds[vertices[j+1]][1] << endl;
+                    // cout << vertices[j] << " x0: " << x0 << " " << vertices[j+1] << " y1: " << y1 << " "
+                    //      << vertices[j+1] << " x1: " << x1 << " " << vertices[j] << " y0: " << y0 << endl;
                 }
-                // cout << endl;
+                area = 1./2. * abs(area);
+                cout << fixed << setprecision(9) << "area: "<< area << endl;
             }
         }
         return true;

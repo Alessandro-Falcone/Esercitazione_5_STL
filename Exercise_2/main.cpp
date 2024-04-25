@@ -19,6 +19,8 @@ int main(){
     if(!letturaMesh(percorso, mesh)){
        cerr << "Errore: impossibile leggere la mesh" << endl;
        return 1;
+    }else{
+        cout << "Tutti i test sono stati superati" << endl;
     }
 
     return 0;
