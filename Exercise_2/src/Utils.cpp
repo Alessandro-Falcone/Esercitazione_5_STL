@@ -82,23 +82,19 @@ namespace PolygonalLibrary{
 
             // double diffx = 0, diffy = 0, lunghezzaLato = 0;
             unsigned int latiPoligoni = 0, distanzaPunti = 0, areaNonNulla = 0;
-            double tolL = 1e-4, tolA = 1e-4, tolLato = 0, tolArea = 0;
+            double tolL = 1e-6, tolA = 1e-6, tolLato = 0, tolArea = 0;
             double tol = 1e+10 * numeric_limits<double>::epsilon();
 
             if(tolL > tol){
                 tolLato = tolL;
-                cout << "tolleranza lato: " << tolLato << endl;
             }else{
                 tolLato = tol;
-                cout << "tolleranza: " << tolLato << endl;
             }
 
             if(tolA > tol){
                 tolArea = tolA;
-                cout << "tolleranza area: " << tolArea << endl;
             }else{
                 tolArea = tol;
-                cout << "tolleranza: " << tolArea << endl;
             }
 
             // for(unsigned int i = 0; i < mesh.NumberCell1Ds; i++){
@@ -113,7 +109,6 @@ namespace PolygonalLibrary{
             //        // << " distanza y: "  << fixed << setprecision(9) << diffy << " lunghezza lato: " << lunghezzaLato << endl;
             //     // }
             // }
-
 
             for(unsigned int i = 0; i < mesh.NumberCell2Ds; i++){
 
@@ -200,7 +195,7 @@ namespace PolygonalLibrary{
                 cout << "Test area dei poligoni diversa da zero superato" << endl;
             }else{
                 cout << "Test lunghezza dei lati diversa da zero potrebbe non essere stato superato" << endl;
-                cout << "Lati che hanno lunghezza diversa da zero: " << distanzaPunti << " su " << mesh.NumberCell2Ds << " poligoli totali" << endl;
+                cout << "Lati che hanno lunghezza diversa da zero: " << distanzaPunti << " su " << latiPoligoni << " lati totali" << endl;
                 cout << "Test area dei poligoni diversa da zero potrebbe non essere stato superato" << endl;
                 cout << "Aree dei poligoni diverse da zero: " << areaNonNulla << " su " << mesh.NumberCell2Ds << " aree totali" << endl;
             }
