@@ -16,7 +16,7 @@ namespace PolygonalLibrary{
             return false;
         }else{
 
-            cout << "Cell0Ds markers: " << endl;
+            cout << "Cell0Ds markers:" << endl;
             for(auto it = mesh.MarkersCell0Ds.begin(); it != mesh.MarkersCell0Ds.end(); it++){
 
                 cout << "key: " << it -> first << " values:";
@@ -32,7 +32,7 @@ namespace PolygonalLibrary{
             return false;
         }else{
 
-            cout << "Cell1D marker:" << endl;
+            cout << "Cell1Ds markers:" << endl;
             for(auto it = mesh.MarkersCell1Ds.begin(); it != mesh.MarkersCell1Ds.end(); it++){
                 cout << "key: " << it -> first << " values:";
                 for(const unsigned int id : it -> second){
@@ -47,7 +47,7 @@ namespace PolygonalLibrary{
             return false;
         }else{
 
-            // cout << "Cell2D marker:" << endl;
+            // cout << "Cell2Ds markers:" << endl;
             // for(auto it = mesh.MarkersCell2Ds.begin(); it != mesh.MarkersCell2Ds.end(); it++){
             //     cout << "key: " << it -> first << " values:";
             //     for(const unsigned int id : it -> second){
@@ -60,11 +60,6 @@ namespace PolygonalLibrary{
             for(unsigned int c = 0; c < mesh.NumberCell2Ds; c++){
 
                 vector<unsigned int> edges = mesh.EdgesCell2Ds[c];
-
-                // for(unsigned int i = 0; i < edges.size(); i++) {
-                //     cout << edges[i] << " ";
-                // }
-                // cout << endl;
 
                 for(unsigned int e = 0; e < edges.size(); e++){
 
@@ -85,55 +80,87 @@ namespace PolygonalLibrary{
                 }
             }
 
-            // Test lati:
+            // double diffx = 0, diffy = 0, lunghezzaLato = 0;
+            unsigned int latiPoligoni = 0, distanzaPunti = 0, areaNonNulla = 0;
+            double tolL = 1e-4, tolA = 1e-4, tolLato = 0, tolArea = 0;
+            double tol = 1e+10 * numeric_limits<double>::epsilon();
 
-            double diffx = 0;
-            double diffy = 0;
-            double lunghezzaLato = 0;
-            for(unsigned int i = 0; i < mesh.NumberCell1Ds; i++){
-
-                Vector2i origine = mesh.VerticesCell1Ds[i];
-                diffx = abs(mesh.CoordinatesCell0Ds[origine[0]][0] - mesh.CoordinatesCell0Ds[origine[1]][0]);
-                diffy = abs(mesh.CoordinatesCell0Ds[origine[0]][1] - mesh.CoordinatesCell0Ds[origine[1]][1]);
-
-                lunghezzaLato = sqrt(diffx*diffx + diffy*diffy);
-                // if(lunghezzaLato > 1e-5){
-                // cout << origine[0] << " " << origine[1] << " distanza x: " << fixed << setprecision(9) << diffx
-                    // << " distanza y: "  << fixed << setprecision(9) << diffy << " lunghezza lato: " << lunghezzaLato << endl;
-                // }
+            if(tolL > tol){
+                tolLato = tolL;
+                cout << "tolleranza lato: " << tolLato << endl;
+            }else{
+                tolLato = tol;
+                cout << "tolleranza: " << tolLato << endl;
             }
 
-            // Test area poligoni:
+            if(tolA > tol){
+                tolArea = tolA;
+                cout << "tolleranza area: " << tolArea << endl;
+            }else{
+                tolArea = tol;
+                cout << "tolleranza: " << tolArea << endl;
+            }
+
+            // for(unsigned int i = 0; i < mesh.NumberCell1Ds; i++){
+
+            //     Vector2i origine = mesh.VerticesCell1Ds[i];
+            //     diffx = abs(mesh.CoordinatesCell0Ds[origine[0]][0] - mesh.CoordinatesCell0Ds[origine[1]][0]);
+            //     diffy = abs(mesh.CoordinatesCell0Ds[origine[0]][1] - mesh.CoordinatesCell0Ds[origine[1]][1]);
+
+            //     lunghezzaLato = sqrt(diffx*diffx + diffy*diffy);
+            //     // if(lunghezzaLato < tolLato){
+            //     // cout << origine[0] << " " << origine[1] << " distanza x: " << fixed << setprecision(9) << diffx
+            //        // << " distanza y: "  << fixed << setprecision(9) << diffy << " lunghezza lato: " << lunghezzaLato << endl;
+            //     // }
+            // }
+
+
             for(unsigned int i = 0; i < mesh.NumberCell2Ds; i++){
 
                 vector<unsigned int> vertices = mesh.VerticesCell2Ds[i];
+                latiPoligoni += vertices.size();
 
-                double diffx = 0, diffy = 0;
-                double lunghezzaLato = 0;
-                // cout << "lati poligono " << i+1 << ": ";
+                // Test lati:
+
+                double diffx = 0, diffy = 0, lunghezzaLato = 0;
 
                 for(unsigned int j = 0; j < vertices.size(); j++){
+
                     if(j < vertices.size() - 1){
 
                         diffx = abs(mesh.CoordinatesCell0Ds[vertices[j]][0] - mesh.CoordinatesCell0Ds[vertices[j+1]][0]);
                         diffy = abs(mesh.CoordinatesCell0Ds[vertices[j]][1] - mesh.CoordinatesCell0Ds[vertices[j+1]][1]);
                         lunghezzaLato = sqrt(diffx*diffx + diffy*diffy);
-                        // cout << fixed << setprecision(9) << lunghezzaLato << " ";
+                        if(lunghezzaLato < tolLato){
+                            cout << "Lato poligono circa uguale a zero: " << "vertici " << vertices[j] << " " << vertices[j+1]
+                                 << ", riga file Cell2Ds " << i+2 << ", lunghezza: "
+                                 << fixed << setprecision(9) << lunghezzaLato << endl;
+                        }
 
                     }else{
 
                         diffx = abs(mesh.CoordinatesCell0Ds[vertices[j]][0] - mesh.CoordinatesCell0Ds[vertices[vertices.size()-j-1]][0]);
                         diffy = abs(mesh.CoordinatesCell0Ds[vertices[j]][1] - mesh.CoordinatesCell0Ds[vertices[vertices.size()-j-1]][1]);
                         lunghezzaLato = sqrt(diffx*diffx + diffy*diffy);
-                        // cout << fixed << setprecision(9) << lunghezzaLato << endl;
+                        if(lunghezzaLato < tolLato){
+                            cout << "Lato poligono circa uguale a zero: " << "vertici " << vertices[j] << " " << vertices[j+1]
+                                 << ", riga file Cell2Ds " << i+2 << ", lunghezza: "
+                                 << fixed << setprecision(9) << lunghezzaLato << endl;
+                        }
+                    }
+
+                    if(lunghezzaLato > tolLato){
+                        distanzaPunti++;
                     }
                 }
 
+                // Test area poligoni:
+
                 double x0 = 0, x1 = 0, y0 = 0, y1 = 0;
-                double sommatoria = 0;
-                double area = 0;
+                double sommatoria = 0, area = 0;
 
                 for(unsigned int j = 0; j < vertices.size(); j++){
+
                     if(j < vertices.size() - 1){
 
                         x0 = mesh.CoordinatesCell0Ds[vertices[j]][0];
@@ -157,20 +184,25 @@ namespace PolygonalLibrary{
                     // cout << vertices[j] << " x0: " << x0 << " " << vertices[j+1] << " y1: " << y1 << " "
                     //      << vertices[j+1] << " x1: " << x1 << " " << vertices[j] << " y0: " << y0 << endl;
                 }
+
                 area = 1./2. * abs(sommatoria);
-                bool areaNonNulla = 0;
-                if(area > 1e-4 && areaNonNulla == 0){
 
-                    areaNonNulla = 0;
-                    // cout << "Tutti i test sono stati superati" << endl;
-
+                if(area > tolArea){
+                    areaNonNulla++;
                 }else{
-
-                    areaNonNulla = 1;
-                    cout << i << " Errore: area molto piccola " << fixed << setprecision(9) << area << endl;
-
+                    cout << fixed << setprecision(9) << "area circa uguale a zero: "<< area
+                         << " riga file Cell2Ds " << i+2 << endl;
                 }
-                // cout << fixed << setprecision(9) << "area: "<< area << endl;
+            }
+
+            if(distanzaPunti == latiPoligoni && areaNonNulla == mesh.NumberCell2Ds){
+                cout << "Test lunghezza dei lati diversa da zero superato" << endl;
+                cout << "Test area dei poligoni diversa da zero superato" << endl;
+            }else{
+                cout << "Test lunghezza dei lati diversa da zero potrebbe non essere stato superato" << endl;
+                cout << "Lati che hanno lunghezza diversa da zero: " << distanzaPunti << " su " << mesh.NumberCell2Ds << " poligoli totali" << endl;
+                cout << "Test area dei poligoni diversa da zero potrebbe non essere stato superato" << endl;
+                cout << "Aree dei poligoni diverse da zero: " << areaNonNulla << " su " << mesh.NumberCell2Ds << " aree totali" << endl;
             }
         }
         return true;
