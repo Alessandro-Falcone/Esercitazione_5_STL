@@ -98,40 +98,79 @@ namespace PolygonalLibrary{
 
                 lunghezzaLato = sqrt(diffx*diffx + diffy*diffy);
                 // if(lunghezzaLato > 1e-5){
-                //     cout << origine[0] << " " << origine[1] << " distanza x: " << diffx << " distanza y: "  << diffy << " lunghezza lato: " << lunghezzaLato << endl;
+                // cout << origine[0] << " " << origine[1] << " distanza x: " << fixed << setprecision(9) << diffx
+                    // << " distanza y: "  << fixed << setprecision(9) << diffy << " lunghezza lato: " << lunghezzaLato << endl;
                 // }
             }
 
             // Test area poligoni:
-
             for(unsigned int i = 0; i < mesh.NumberCell2Ds; i++){
 
                 vector<unsigned int> vertices = mesh.VerticesCell2Ds[i];
 
-                double area = 0;
-                double x0 = 0, x1 = 0, y0 = 0, y1 = 0;
+                double diffx = 0, diffy = 0;
+                double lunghezzaLato = 0;
+                // cout << "lati poligono " << i+1 << ": ";
+
                 for(unsigned int j = 0; j < vertices.size(); j++){
                     if(j < vertices.size() - 1){
+
+                        diffx = abs(mesh.CoordinatesCell0Ds[vertices[j]][0] - mesh.CoordinatesCell0Ds[vertices[j+1]][0]);
+                        diffy = abs(mesh.CoordinatesCell0Ds[vertices[j]][1] - mesh.CoordinatesCell0Ds[vertices[j+1]][1]);
+                        lunghezzaLato = sqrt(diffx*diffx + diffy*diffy);
+                        // cout << fixed << setprecision(9) << lunghezzaLato << " ";
+
+                    }else{
+
+                        diffx = abs(mesh.CoordinatesCell0Ds[vertices[j]][0] - mesh.CoordinatesCell0Ds[vertices[vertices.size()-j-1]][0]);
+                        diffy = abs(mesh.CoordinatesCell0Ds[vertices[j]][1] - mesh.CoordinatesCell0Ds[vertices[vertices.size()-j-1]][1]);
+                        lunghezzaLato = sqrt(diffx*diffx + diffy*diffy);
+                        // cout << fixed << setprecision(9) << lunghezzaLato << endl;
+                    }
+                }
+
+                double x0 = 0, x1 = 0, y0 = 0, y1 = 0;
+                double sommatoria = 0;
+                double area = 0;
+
+                for(unsigned int j = 0; j < vertices.size(); j++){
+                    if(j < vertices.size() - 1){
+
                         x0 = mesh.CoordinatesCell0Ds[vertices[j]][0];
                         y1 = mesh.CoordinatesCell0Ds[vertices[j+1]][1];
                         x1 = mesh.CoordinatesCell0Ds[vertices[j+1]][0];
                         y0 = mesh.CoordinatesCell0Ds[vertices[j]][1];
-                        area += (x0*y1) - (x1*y0);
+                        sommatoria += (x0*y1) - (x1*y0);
+
                     }else{
+
                         x0 = mesh.CoordinatesCell0Ds[vertices[j]][0];
                         y1 = mesh.CoordinatesCell0Ds[vertices[vertices.size()-j-1]][1];
                         x1 = mesh.CoordinatesCell0Ds[vertices[vertices.size()-j-1]][0];
                         y0 = mesh.CoordinatesCell0Ds[vertices[j]][1];
-                        area += (x0*y1) - (x1*y0);
+                        sommatoria += (x0*y1) - (x1*y0);
                     }
+
                     // distanza = mesh.CoordinatesCell0Ds[vertices[j]][0]*mesh.CoordinatesCell0Ds[vertices[j+1]][1];
                     // cout << vertices[j] << " x0: " << mesh.CoordinatesCell0Ds[vertices[j]][0] << " " << vertices[j+1] << " y1: " << mesh.CoordinatesCell0Ds[vertices[j+1]][1]
                     //     << " prodotto: "<< mesh.CoordinatesCell0Ds[vertices[j]][0]*mesh.CoordinatesCell0Ds[vertices[j+1]][1] << endl;
                     // cout << vertices[j] << " x0: " << x0 << " " << vertices[j+1] << " y1: " << y1 << " "
                     //      << vertices[j+1] << " x1: " << x1 << " " << vertices[j] << " y0: " << y0 << endl;
                 }
-                area = 1./2. * abs(area);
-                cout << fixed << setprecision(9) << "area: "<< area << endl;
+                area = 1./2. * abs(sommatoria);
+                bool areaNonNulla = 0;
+                if(area > 1e-4 && areaNonNulla == 0){
+
+                    areaNonNulla = 0;
+                    // cout << "Tutti i test sono stati superati" << endl;
+
+                }else{
+
+                    areaNonNulla = 1;
+                    cout << i << " Errore: area molto piccola " << fixed << setprecision(9) << area << endl;
+
+                }
+                // cout << fixed << setprecision(9) << "area: "<< area << endl;
             }
         }
         return true;
@@ -324,28 +363,6 @@ namespace PolygonalLibrary{
                 //     cout << line << " " << endl;
                 // }
 
-                // if(nVertices == 3 && nEdges == 3){
-                //     cout << "\ntriangolo alla riga: " << id << endl;
-                //     cout << "vertici: ";
-                // }
-
-                // for(unsigned int i = 0; i < nVertices; i++){
-                //     if(nVertices == 3 && nEdges == 3){
-                //         cout << vertices[i] << " ";
-                //     }
-                // }
-
-                // if(nVertices == 3 && nEdges == 3){
-                //     cout << "lati: ";
-                // }
-
-                // for(unsigned int i = 0; i < nEdges; i++){
-                //     if(nVertices == 3 && nEdges == 3){
-                //         cout << edges[i] << " ";
-                //     }
-                // }
-                // // cout << "\n";
-
                 mesh.IdCell2Ds.push_back(id);
                 mesh.VerticesCell2Ds.push_back(vertices);
                 mesh.EdgesCell2Ds.push_back(edges);
@@ -361,7 +378,6 @@ namespace PolygonalLibrary{
                 }
             }
 
-            // cout << endl;
             fileCell2Ds.close();
             return true;
         }
