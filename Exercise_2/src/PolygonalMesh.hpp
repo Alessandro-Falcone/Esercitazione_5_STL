@@ -26,10 +26,6 @@ namespace PolygonalLibrary{
         vector<vector<unsigned int>> VerticesCell2Ds = {}; // indici vertici Cell2Ds, size 1 x NumberCell2DsVertices[NumberCell2Ds]
         vector<vector<unsigned int>> EdgesCell2Ds = {}; // indici Cell1Ds Cell2Ds, size 1 x NumberCell2DsEdges[NumberCell2Ds]
         map<unsigned int, list<unsigned int>> MarkersCell2Ds = {}; // proprietà Cell2Ds, size 1 x NumberCell2Ds (marker)
-
-        // double tol = 10 * numeric_limits<double>::epsilon(); // in base posizione cambia la tolleranza
-        // 3 tolleranze default specificato dall'utente e 1D
-        // metodo della classe cambia dagli attributi in questo caso no
     };
 }
 

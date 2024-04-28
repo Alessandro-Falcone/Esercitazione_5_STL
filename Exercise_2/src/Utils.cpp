@@ -16,7 +16,7 @@ namespace PolygonalLibrary{
             return false;
         }else{
 
-            cout << "Cell0Ds markers:" << endl;
+            cout << "Cell0Ds markers:" << endl; // output markers file Cell0Ds.csv
             for(auto it = mesh.MarkersCell0Ds.begin(); it != mesh.MarkersCell0Ds.end(); it++){
 
                 cout << "key: " << it -> first << " values:";
@@ -32,7 +32,7 @@ namespace PolygonalLibrary{
             return false;
         }else{
 
-            cout << "Cell1Ds markers:" << endl;
+            cout << "\nCell1Ds markers:" << endl; // output markers file Cell1Ds.csv
             for(auto it = mesh.MarkersCell1Ds.begin(); it != mesh.MarkersCell1Ds.end(); it++){
                 cout << "key: " << it -> first << " values:";
                 for(const unsigned int id : it -> second){
@@ -47,16 +47,26 @@ namespace PolygonalLibrary{
             return false;
         }else{
 
-            // cout << "Cell2Ds markers:" << endl;
-            // for(auto it = mesh.MarkersCell2Ds.begin(); it != mesh.MarkersCell2Ds.end(); it++){
-            //     cout << "key: " << it -> first << " values:";
-            //     for(const unsigned int id : it -> second){
-            //         cout << " " << id;
-            //     }
-            //     cout << endl;
-            // }
+            // 3 contatori che mi servono per dire se il Test lati poligoni e il Test area poligoni sono stati superati
+            unsigned int latiPoligoni = 0, distanzaPunti = 0, areaNonNulla = 0;
+
+            double tolLato = 1e-6, tolArea = 1e-6; // tolleranze lunghezza lati e area
+            double tol = numeric_limits<double>::epsilon(); // tolleranza definita con la epsilon di macchina
+
+            if(tolLato > tol){
+                tolLato = tolLato; // se è soddisfatta la condizione del if prendo come tolleranza del lato la tolleranza del lato definita dall'utente
+            }else{
+                tolLato = tol; // se non è soddisfatta la condizione del if prendo come tolleranza del lato la tolleranza definita con la epsilon di macchina
+            }
+
+            if(tolArea > tol){
+                tolArea = tolArea; // se è soddisfatta la condizione del if prendo come tolleranza dell'area la tolleranza dell'area definita dall'utente
+            }else{
+                tolArea = tol; // se è soddisfatta la condizione del if prendo come tolleranza dell'area la tolleranza dell'area definita dall'utente
+            }
 
             // Test:
+
             for(unsigned int c = 0; c < mesh.NumberCell2Ds; c++){
 
                 vector<unsigned int> edges = mesh.EdgesCell2Ds[c];
@@ -80,123 +90,111 @@ namespace PolygonalLibrary{
                 }
             }
 
-            // double diffx = 0, diffy = 0, lunghezzaLato = 0;
-            unsigned int latiPoligoni = 0, distanzaPunti = 0, areaNonNulla = 0;
-            double tolL = 1e-6, tolA = 1e-6, tolLato = 0, tolArea = 0;
-            double tol = 1e+10 * numeric_limits<double>::epsilon();
+            cout << "\nTest: i lati dei poligoni hanno lunghezza diversa da zero" << endl;
+            // Test lati poligoni: i lati dei poligoni hanno lunghezza diversa da zero
 
-            if(tolL > tol){
-                tolLato = tolL;
-            }else{
-                tolLato = tol;
-            }
+            for(unsigned int l = 0; l < mesh.NumberCell2Ds; l++){
 
-            if(tolA > tol){
-                tolArea = tolA;
-            }else{
-                tolArea = tol;
-            }
+                vector<unsigned int> edges = mesh.EdgesCell2Ds[l];
 
-            // for(unsigned int i = 0; i < mesh.NumberCell1Ds; i++){
+                // sommo fino ad avere il totale del numero di lati dei poligoni presenti all'interno del file Cell2Ds.csv,
+                // mi servirà per dire se il Test lati poligoni è stato superato oppure no
+                latiPoligoni += edges.size();
 
-            //     Vector2i origine = mesh.VerticesCell1Ds[i];
-            //     diffx = abs(mesh.CoordinatesCell0Ds[origine[0]][0] - mesh.CoordinatesCell0Ds[origine[1]][0]);
-            //     diffy = abs(mesh.CoordinatesCell0Ds[origine[0]][1] - mesh.CoordinatesCell0Ds[origine[1]][1]);
+                double diffx = 0, diffy = 0; // variabili double in cui salvo la differenza delle x (diffx) e delle y (diffy)
+                double lunghezzaLato = 0; // variabile double in cui salvo la lunghezza dei lati
 
-            //     lunghezzaLato = sqrt(diffx*diffx + diffy*diffy);
-            //     // if(lunghezzaLato < tolLato){
-            //     // cout << origine[0] << " " << origine[1] << " distanza x: " << fixed << setprecision(9) << diffx
-            //        // << " distanza y: "  << fixed << setprecision(9) << diffy << " lunghezza lato: " << lunghezzaLato << endl;
-            //     // }
-            // }
+                for(unsigned int e = 0; e < edges.size(); e++){
 
-            for(unsigned int i = 0; i < mesh.NumberCell2Ds; i++){
+                    const unsigned int origin = mesh.VerticesCell1Ds[edges[e]][0];
+                    const unsigned int end = mesh.VerticesCell1Ds[edges[e]][1];
 
-                vector<unsigned int> vertices = mesh.VerticesCell2Ds[i];
-                latiPoligoni += vertices.size();
-
-                // Test lati:
-
-                double diffx = 0, diffy = 0, lunghezzaLato = 0;
-
-                for(unsigned int j = 0; j < vertices.size(); j++){
-
-                    if(j < vertices.size() - 1){
-
-                        diffx = abs(mesh.CoordinatesCell0Ds[vertices[j]][0] - mesh.CoordinatesCell0Ds[vertices[j+1]][0]);
-                        diffy = abs(mesh.CoordinatesCell0Ds[vertices[j]][1] - mesh.CoordinatesCell0Ds[vertices[j+1]][1]);
-                        lunghezzaLato = sqrt(diffx*diffx + diffy*diffy);
-                        if(lunghezzaLato < tolLato){
-                            cout << "Lato poligono circa uguale a zero: " << "vertici " << vertices[j] << " " << vertices[j+1]
-                                 << ", riga file Cell2Ds " << i+2 << ", lunghezza: "
-                                 << fixed << setprecision(9) << lunghezzaLato << endl;
-                        }
-
-                    }else{
-
-                        diffx = abs(mesh.CoordinatesCell0Ds[vertices[j]][0] - mesh.CoordinatesCell0Ds[vertices[vertices.size()-j-1]][0]);
-                        diffy = abs(mesh.CoordinatesCell0Ds[vertices[j]][1] - mesh.CoordinatesCell0Ds[vertices[vertices.size()-j-1]][1]);
-                        lunghezzaLato = sqrt(diffx*diffx + diffy*diffy);
-                        if(lunghezzaLato < tolLato){
-                            cout << "Lato poligono circa uguale a zero: " << "vertici " << vertices[j] << " " << vertices[j+1]
-                                 << ", riga file Cell2Ds " << i+2 << ", lunghezza: "
-                                 << fixed << setprecision(9) << lunghezzaLato << endl;
-                        }
-                    }
+                    diffx = (mesh.CoordinatesCell0Ds[origin][0] - mesh.CoordinatesCell0Ds[end][0]);
+                    diffy = (mesh.CoordinatesCell0Ds[origin][1] - mesh.CoordinatesCell0Ds[end][1]);
+                    lunghezzaLato = sqrt(pow(diffx,2) + pow(diffy,2)); // formula per calcolare la distanza tra due punti
 
                     if(lunghezzaLato > tolLato){
+                        // conto quanti sono i lati dei poligoni diversi da zero,
+                        // mi servirà per dire se il Test lati poligoni è stato superato oppure no
                         distanzaPunti++;
-                    }
-                }
-
-                // Test area poligoni:
-
-                double x0 = 0, x1 = 0, y0 = 0, y1 = 0;
-                double sommatoria = 0, area = 0;
-
-                for(unsigned int j = 0; j < vertices.size(); j++){
-
-                    if(j < vertices.size() - 1){
-
-                        x0 = mesh.CoordinatesCell0Ds[vertices[j]][0];
-                        y1 = mesh.CoordinatesCell0Ds[vertices[j+1]][1];
-                        x1 = mesh.CoordinatesCell0Ds[vertices[j+1]][0];
-                        y0 = mesh.CoordinatesCell0Ds[vertices[j]][1];
-                        sommatoria += (x0*y1) - (x1*y0);
 
                     }else{
+                        // se non è soddisfatta la condizione dell'if vado a stampare quale lato del poligono che sto analizzando
+                        // ha una lunghezza che per la tolleranza presa in considerazione risulta essere uguale a zero
 
-                        x0 = mesh.CoordinatesCell0Ds[vertices[j]][0];
-                        y1 = mesh.CoordinatesCell0Ds[vertices[vertices.size()-j-1]][1];
-                        x1 = mesh.CoordinatesCell0Ds[vertices[vertices.size()-j-1]][0];
-                        y0 = mesh.CoordinatesCell0Ds[vertices[j]][1];
-                        sommatoria += (x0*y1) - (x1*y0);
+                        cout << "Lato poligono uguale a zero per la tolleranza inserita: riga file Cell2Ds " << l+2
+                             << ", vertici " << origin << " " << end
+                             << " (lunghezza: " << fixed << setprecision(9) << lunghezzaLato << ")" << endl;
                     }
-
-                    // distanza = mesh.CoordinatesCell0Ds[vertices[j]][0]*mesh.CoordinatesCell0Ds[vertices[j+1]][1];
-                    // cout << vertices[j] << " x0: " << mesh.CoordinatesCell0Ds[vertices[j]][0] << " " << vertices[j+1] << " y1: " << mesh.CoordinatesCell0Ds[vertices[j+1]][1]
-                    //     << " prodotto: "<< mesh.CoordinatesCell0Ds[vertices[j]][0]*mesh.CoordinatesCell0Ds[vertices[j+1]][1] << endl;
-                    // cout << vertices[j] << " x0: " << x0 << " " << vertices[j+1] << " y1: " << y1 << " "
-                    //      << vertices[j+1] << " x1: " << x1 << " " << vertices[j] << " y0: " << y0 << endl;
-                }
-
-                area = 1./2. * abs(sommatoria);
-
-                if(area > tolArea){
-                    areaNonNulla++;
-                }else{
-                    cout << fixed << setprecision(9) << "area circa uguale a zero: "<< area
-                         << " riga file Cell2Ds " << i+2 << endl;
                 }
             }
 
-            if(distanzaPunti == latiPoligoni && areaNonNulla == mesh.NumberCell2Ds){
-                cout << "Test lunghezza dei lati diversa da zero superato" << endl;
-                cout << "Test area dei poligoni diversa da zero superato" << endl;
+            if(distanzaPunti == latiPoligoni){ // contatori uguali Test lati poligoni superato
+                cout << "Test superato" << endl;
             }else{
-                cout << "Test lunghezza dei lati diversa da zero potrebbe non essere stato superato" << endl;
+
+                // condizione dell'if non soddisfatta quindi contatori non uguali Test lati poligoni non superato
+                cout << "Test non superato" << endl;
+                // stampo quanti lati dei poligoni hanno lunghezza diversa da zero sul numero totale
                 cout << "Lati che hanno lunghezza diversa da zero: " << distanzaPunti << " su " << latiPoligoni << " lati totali" << endl;
-                cout << "Test area dei poligoni diversa da zero potrebbe non essere stato superato" << endl;
+            }
+
+            cout << "\nTest: l'area dei poligoni e' diversa da zero" << endl;
+            // Test area poligoni: l'area dei poligoni è diversa da zero
+            // formula area = 1/2 * abs(sommatoria((x0*y1) - (x1*y0)))
+
+            for(unsigned int a = 0; a < mesh.NumberCell2Ds; a++){
+
+                vector<unsigned int> vertices = mesh.VerticesCell2Ds[a];
+
+                double x0 = 0, x1 = 0, y0 = 0, y1 = 0; // variabili double in cui salvo le coordinate dei punti
+                double sommatoria = 0; // variabile double in cui salvo la sommatoria data da abs(sommatoria((x0*y1) - (x1*y0)))
+                double area = 0; // variabile double in cui salvo l'area dei poligoni data da area = 1/2 * abs(sommatoria((x0*y1) - (x1*y0)))
+
+                for(unsigned int i = 0; i < vertices.size(); i++){
+
+                    if(i < vertices.size() - 1){
+                        // se è soddisfatta la condizione dell'if salvo le coordinate dei punti per i = 0, 1, 2,...,vertices.size() - 2
+                        // nelle variabili double x0, y0, x1, y1 e calcolo la sommatoria
+                        x0 = mesh.CoordinatesCell0Ds[vertices[i]][0];
+                        y1 = mesh.CoordinatesCell0Ds[vertices[i+1]][1];
+                        x1 = mesh.CoordinatesCell0Ds[vertices[i+1]][0];
+                        y0 = mesh.CoordinatesCell0Ds[vertices[i]][1];
+                        sommatoria += (x0*y1) - (x1*y0);
+
+                    }else{
+                        // se non è soddisfatta la condizione dell'if salvo le coordinate del punto non considerato con i = vertices.size() - 1
+                        // e del primo punto con i = 0 nelle variabili double x0, y0, x1, y1 e continuo con la sommatoria riferita allo stesso poligono
+                        // e dopo proseguo con il poligono successivo e così via
+                        x0 = mesh.CoordinatesCell0Ds[vertices[i]][0];
+                        y1 = mesh.CoordinatesCell0Ds[vertices[vertices.size()-i-1]][1];
+                        x1 = mesh.CoordinatesCell0Ds[vertices[vertices.size()-i-1]][0];
+                        y0 = mesh.CoordinatesCell0Ds[vertices[i]][1];
+                        sommatoria += (x0*y1) - (x1*y0);
+                    }
+                }
+
+                area = 1./2. * abs(sommatoria); // calcolo l'area di ogni poligono
+
+                if(area > tolArea){
+                    // conto quante sono le aree dei poligoni diverse da zero,
+                    // mi servirà per dire se il Test area poligoni è stato superato oppure no
+                    areaNonNulla++;
+
+                }else{
+                    // se non è soddisfatta la condizione dell'if vado a stampare l'area del poligono che sto analizzando
+                    // ha area che per la tolleranza presa in considerazione risulta essere uguale a zero
+                    cout << fixed << setprecision(9) << "Area uguale a zero per la tolleranza inserita: riga file Cell2Ds " << a+2
+                         << " (area: " << area << ")" << endl;
+                }
+            }
+
+            if(areaNonNulla == mesh.NumberCell2Ds){ // contatore uguale al numero di righe del file Cell2Ds.csv Test area poligoni superato
+                cout << "Test superato" << endl;
+            }else{
+                // condizione dell'if non soddisfatta quindi contatore non uguale al numero di righe del file Cell2Ds.csv Test area poligoni non superato
+                cout << "Test non superato" << endl;
+                // stampo quante aree dei poligoni sono diverse da zero sul numero totale
                 cout << "Aree dei poligoni diverse da zero: " << areaNonNulla << " su " << mesh.NumberCell2Ds << " aree totali" << endl;
             }
         }
@@ -351,13 +349,14 @@ namespace PolygonalLibrary{
             mesh.NumberCell2Ds = listLines.size();
 
             if(mesh.NumberCell2Ds == 0){
-                cerr << "Non ci sono cell 2D" << endl;
+                cerr << "Non ci sono cell 2Ds" << endl;
                 return false;
             }
 
             mesh.IdCell2Ds.reserve(mesh.NumberCell2Ds);
             mesh.VerticesCell2Ds.reserve(mesh.NumberCell2Ds);
             mesh.EdgesCell2Ds.reserve(mesh.NumberCell2Ds);
+            unsigned int markerZero2Ds = 0; // contatore che conta quanti marker uguali a zero ci sono nel file Cell2Ds.csv
 
             for(const string& line : listLines){
 
@@ -386,10 +385,6 @@ namespace PolygonalLibrary{
                     edges.push_back(stoi(riga));
                 }
 
-                // if(mesh.NumberCell2Ds != 0){
-                //     cout << line << " " << endl;
-                // }
-
                 mesh.IdCell2Ds.push_back(id);
                 mesh.VerticesCell2Ds.push_back(vertices);
                 mesh.EdgesCell2Ds.push_back(edges);
@@ -402,7 +397,14 @@ namespace PolygonalLibrary{
                     auto ret = mesh.MarkersCell2Ds.insert({marker, {id}});
                     if(!ret.second)
                         (ret.first) -> second.push_back(id);
+                }else{
+                    markerZero2Ds++;
                 }
+            }
+
+            if(markerZero2Ds == mesh.NumberCell2Ds){
+                cout << "\nCell2Ds markers: " << endl;
+                cout << "Tutti i markers nel file Cell2Ds.csv sono uguali a zero" << endl;
             }
 
             fileCell2Ds.close();
